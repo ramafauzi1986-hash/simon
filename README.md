@@ -21,6 +21,16 @@ Sistem Monitoring Kinerja Sekretariat DPRD.
 - Laporan dan ekspor
 
 ## Instalasi
-`composer install` → `.env` → `php artisan key:generate` → `php artisan migrate --seed` → `php artisan storage:link` → `php artisan serve`
+1. `composer install`
+2. Salin `.env.example` menjadi `.env`
+3. Atur koneksi MySQL.
+4. `php artisan key:generate`
+5. `php artisan migrate --seed`
+6. `php artisan storage:link`
+7. `php artisan serve`
 
-Akun development: `admin@simon-setwan.local` / `password`.
+## Akun development
+- Email: `admin@simon-setwan.local`
+- Password: `password`
+
+Ganti password default sebelum digunakan pada produksi.
