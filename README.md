@@ -10,7 +10,7 @@ Sistem Monitoring Kinerja Sekretariat DPRD.
 - AdminLTE 4
 - Chart.js
 
-## Modul
+## Modul saat ini
 - Login dan role pengguna
 - Dashboard monitoring kinerja
 - Program, Kegiatan, Sub Kegiatan
@@ -33,4 +33,4 @@ Sistem Monitoring Kinerja Sekretariat DPRD.
 - Email: `admin@simon-setwan.local`
 - Password: `password`
 
-Ganti password default sebelum produksi.
+Ganti password default sebelum digunakan pada produksi.
