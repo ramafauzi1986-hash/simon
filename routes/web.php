@@ -3,6 +3,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\KegiatanController;
+use App\Http\Controllers\SubKegiatanController;
+use App\Http\Controllers\IndikatorKinerjaController;
 Route::get('/', fn () => redirect('/dashboard'));
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
@@ -11,3 +13,9 @@ Route::delete('/programs/{program}', [ProgramController::class, 'destroy'])->nam
 Route::get('/kegiatans', [KegiatanController::class, 'index'])->name('kegiatans.index');
 Route::post('/kegiatans', [KegiatanController::class, 'store'])->name('kegiatans.store');
 Route::delete('/kegiatans/{kegiatan}', [KegiatanController::class, 'destroy'])->name('kegiatans.destroy');
+Route::get('/sub-kegiatans', [SubKegiatanController::class, 'index'])->name('sub-kegiatans.index');
+Route::post('/sub-kegiatans', [SubKegiatanController::class, 'store'])->name('sub-kegiatans.store');
+Route::delete('/sub-kegiatans/{subKegiatan}', [SubKegiatanController::class, 'destroy'])->name('sub-kegiatans.destroy');
+Route::get('/indikators', [IndikatorKinerjaController::class, 'index'])->name('indikators.index');
+Route::post('/indikators', [IndikatorKinerjaController::class, 'store'])->name('indikators.store');
+Route::delete('/indikators/{indikator}', [IndikatorKinerjaController::class, 'destroy'])->name('indikators.destroy');
