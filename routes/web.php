@@ -25,3 +25,4 @@ Route::get('/realisasi', [RealisasiController::class, 'index'])->name('realisasi
 Route::post('/realisasi', [RealisasiController::class, 'store'])->name('realisasi.store');
 Route::delete('/realisasi/{realisasi}', [RealisasiController::class, 'destroy'])->name('realisasi.destroy');
 Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+Route::get('/laporan/export/csv', [LaporanController::class, 'csv'])->name('laporan.csv');
