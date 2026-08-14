@@ -7,15 +7,18 @@ Sistem Monitoring Kinerja Sekretariat DPRD.
 - PHP 8.3
 - MySQL 8
 - Bootstrap 5
-- AdminLTE 4
+- AdminLTE 4 (akan digunakan pada UI dashboard)
 - Chart.js
 
-## Modul awal
-- Dashboard monitoring
-- Program
+## Modul
+- Login dan role pengguna
+- Dashboard monitoring kinerja
+- Program, Kegiatan, Sub Kegiatan
 - Indikator kinerja
-- Realisasi
-- Database migrations dan seeder
+- Target tahunan dan Triwulan I-IV
+- Realisasi kinerja
+- Evidence/dokumen pendukung
+- Laporan dan ekspor
 
 ## Instalasi
 1. `composer install`
@@ -25,3 +28,9 @@ Sistem Monitoring Kinerja Sekretariat DPRD.
 5. `php artisan migrate --seed`
 6. `php artisan storage:link`
 7. `php artisan serve`
+
+## Akun awal development
+- Email: `admin@simon-setwan.local`
+- Password: `password`
+
+> Ganti password default sebelum digunakan pada lingkungan produksi.
