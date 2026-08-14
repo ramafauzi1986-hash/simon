@@ -6,6 +6,7 @@ use App\Http\Controllers\KegiatanController;
 use App\Http\Controllers\SubKegiatanController;
 use App\Http\Controllers\IndikatorKinerjaController;
 use App\Http\Controllers\RealisasiController;
+use App\Http\Controllers\LaporanController;
 Route::get('/', fn () => redirect('/dashboard'));
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
@@ -23,3 +24,4 @@ Route::delete('/indikators/{indikator}', [IndikatorKinerjaController::class, 'de
 Route::get('/realisasi', [RealisasiController::class, 'index'])->name('realisasi.index');
 Route::post('/realisasi', [RealisasiController::class, 'store'])->name('realisasi.store');
 Route::delete('/realisasi/{realisasi}', [RealisasiController::class, 'destroy'])->name('realisasi.destroy');
+Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
