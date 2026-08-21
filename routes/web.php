@@ -23,13 +23,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/programs', [ProgramController::class, 'index'])->name('programs.index');
         Route::post('/programs', [ProgramController::class, 'store'])->name('programs.store');
         Route::get('/programs/{program}', [ProgramController::class, 'show'])->name('programs.show');
+        Route::put('/programs/{program}', [ProgramController::class, 'update'])->name('programs.update');
         Route::delete('/programs/{program}', [ProgramController::class, 'destroy'])->name('programs.destroy');
 
         Route::post('/programs/{program}/kegiatans', [KegiatanController::class, 'store'])->name('programs.kegiatans.store');
         Route::get('/programs/{program}/kegiatans/{kegiatan}', [KegiatanController::class, 'show'])->name('programs.kegiatans.show');
+        Route::put('/programs/{program}/kegiatans/{kegiatan}', [KegiatanController::class, 'update'])->name('programs.kegiatans.update');
         Route::delete('/programs/{program}/kegiatans/{kegiatan}', [KegiatanController::class, 'destroy'])->name('programs.kegiatans.destroy');
 
         Route::post('/kegiatans/{kegiatan}/sub-kegiatans', [SubKegiatanController::class, 'store'])->name('kegiatans.sub-kegiatans.store');
+        Route::put('/kegiatans/{kegiatan}/sub-kegiatans/{subKegiatan}', [SubKegiatanController::class, 'update'])->name('kegiatans.sub-kegiatans.update');
         Route::delete('/kegiatans/{kegiatan}/sub-kegiatans/{subKegiatan}', [SubKegiatanController::class, 'destroy'])->name('kegiatans.sub-kegiatans.destroy');
 
         Route::get('/indikators', [IndikatorKinerjaController::class, 'index'])->name('indikators.index');
