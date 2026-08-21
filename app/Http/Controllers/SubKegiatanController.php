@@ -20,6 +20,21 @@ class SubKegiatanController extends Controller
         return back()->with('success', 'Sub Kegiatan berhasil ditambahkan pada Kegiatan yang dipilih.');
     }
 
+    public function update(Request $request, Kegiatan $kegiatan, SubKegiatan $subKegiatan)
+    {
+        abort_unless($subKegiatan->kegiatan_id === $kegiatan->id, 404);
+
+        $data = $request->validate([
+            'kode' => 'nullable|string|max:50',
+            'nama' => 'required|string|max:255',
+            'target' => 'nullable|numeric',
+            'satuan' => 'nullable|string|max:50',
+        ]);
+
+        $subKegiatan->update($data);
+        return back()->with('success', 'Sub Kegiatan berhasil diperbarui.');
+    }
+
     public function destroy(Kegiatan $kegiatan, SubKegiatan $subKegiatan)
     {
         abort_unless($subKegiatan->kegiatan_id === $kegiatan->id, 404);
