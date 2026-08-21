@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Realisasi Keuangan</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col justify-between p-4">
+            <div>
+                <div class="flex items-center gap-3 px-2 py-4 border-b border-slate-800">
+                    <i class="fa-solid me-2 fa-chart-pie text-blue-500 text-2xl"></i>
+                    <span class="font-bold text-lg">KeuanganApp</span>
+                </div>
+                
+                <nav class="mt-6 space-y-2">
+                    <a href="#" id="nav-dashboard" onclick="showView('dashboard')" class="flex items-center gap-3 px-3 py-2 bg-blue-600 rounded-lg text-white font-medium">
+                        <i class="fa-solid fa-gauge"></i> Dashboard
+                    </a>
+                    <div class="rounded-lg border border-slate-800">
+                        <div id="programToggle" class="flex items-center justify-between gap-3 px-3 py-2 text-slate-300 bg-slate-900 rounded-t-lg cursor-pointer" onclick="toggleProgramMenu()">
+                            <div class="flex items-center gap-3">
+                                <i class="fa-solid fa-layer-group"></i> Program
+                            </div>
+                            <i id="programToggleIcon" class="fa-solid fa-chevron-down text-slate-400"></i>
+                        </div>
+                        <div id="programSubmenu" class="space-y-1 px-2 py-2 bg-slate-950 rounded-b-lg hidden">
+                            <a href="#" id="nav-kegiatan" onclick="showView('rincian','nav-kegiatan')" class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                                <i class="fa-solid fa-list-check"></i> Kegiatan
+                            </a>
+                            <a href="#" id="nav-sub" onclick="showView('sub','nav-sub')" class="flex items-center gap-3 px-3 py-2 text-slate-400 hover:bg-slate-800 hover:text-white rounded-lg transition">
+                                <i class="fa-solid fa-file-invoice-dollar"></i> Sub-Kegiatan
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+            <div class="text-xs text-slate-500 text-center border-t border-slate-800 pt-4">
+                v2.0 Realisasi Keuangan
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-8">
+            <!-- Header -->
+            <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900">Dashboard Realisasi Keuangan</h1>
+                    <p class="text-sm text-slate-500">Monitoring Anggaran Sebelum & Sesudah Akumulasi Sub-Kegiatan</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.print()" class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 text-sm font-medium shadow-sm">
+                        <i class="fa-solid fa-print me-2"></i> Cetak Laporan
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard View: Ringkasan Akumulasi (KPI Cards) + Chart -->
+            <div id="view-dashboard">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Pagu Anggaran</span>
+                    <h3 class="text-xl font-bold text-slate-900 mt-2" id="kpi-pagu">Rp 0</h3>
+                    <p class="text-xs text-slate-500 mt-1">Seluruh Program & Sub-Kegiatan</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Realisasi (Sebelum Akumulasi)</span>
+                    <h3 class="text-xl font-bold text-amber-600 mt-2" id="kpi-parsial">Rp 0</h3>
+                    <p class="text-xs text-slate-500 mt-1">Rata-rata Sub-Kegiatan: <span id="avg-sub">0</span> item</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Realisasi (Sesudah Akumulasi)</span>
+                    <h3 class="text-xl font-bold text-emerald-600 mt-2" id="kpi-akumulasi">Rp 0</h3>
+                    <p class="text-xs text-emerald-600 mt-1 font-medium" id="kpi-persen">0% Terrealisasi</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Sisa Anggaran</span>
+                    <h3 class="text-xl font-bold text-rose-600 mt-2" id="kpi-sisa">Rp 0</h3>
+                    <p class="text-xs text-slate-500 mt-1">Sisa dana yang belum diserap</p>
+                </div>
+                </div>
+
+                <!-- Chart section -->
+                <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm mb-8">
+                    <h2 class="text-base font-bold text-slate-900 mb-4">Grafik Perbandingan Anggaran vs Realisasi Akumulasi</h2>
+                    <div class="h-64">
+                        <canvas id="realisasiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table/View section (used for Rincian & Sub-Kegiatan) -->
+            <div id="view-table" class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden hidden">
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h2 id="tableTitle" class="text-base font-bold text-slate-900">Kegiatan</h2>
+                    <div class="flex items-center gap-3">
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari kegiatan/sub-kegiatan..." class="px-4 py-2 border border-slate-300 rounded-lg text-sm w-full md:w-64 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <button id="exportCsvBtn" onclick="exportTableCSV()" class="px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-500">Export CSV</button>
+                        <button id="btnShowAddSub" onclick="toggleAddSubForm()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-500">Tambah Sub</button>
+                    </div>
+                </div>
+                <!-- Add Sub-Kegiatan Form (hidden, moved here) -->
+                <div id="addSubForm" class="p-4 border-t border-slate-100 hidden bg-slate-50">
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-slate-600">Pilih Kegiatan</label>
+                            <select id="addSubParent" class="w-full px-3 py-2 border rounded">
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-600">Kode</label>
+                            <input id="addSubKode" class="px-3 py-2 border rounded w-full" placeholder="1.01.01.04">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-slate-600">Nama Sub-Kegiatan</label>
+                            <input id="addSubNama" class="px-3 py-2 border rounded w-full" placeholder="Nama sub-kegiatan">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-600">Pagu</label>
+                            <input id="addSubPagu" type="number" class="px-3 py-2 border rounded w-full" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-600">Realisasi</label>
+                            <input id="addSubRealisasi" type="number" class="px-3 py-2 border rounded w-full" placeholder="0">
+                        </div>
+                        <div class="md:col-span-6 flex gap-2 mt-2">
+                            <button onclick="addSubKegiatanFromForm()" class="px-4 py-2 bg-emerald-600 text-white rounded">Tambah</button>
+                            <button onclick="toggleAddSubForm(true)" class="px-4 py-2 bg-slate-300 rounded">Batal</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Add Kegiatan Form (hidden) -->
+                <div id="addKegForm" class="p-4 border-t border-slate-100 hidden bg-slate-50">
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
+                        <div class="md:col-span-2">
+                            <label class="text-xs text-slate-600">Kode Kegiatan</label>
+                            <input id="addKegKode" class="px-3 py-2 border rounded w-full" placeholder="1.01.03">
+                        </div>
+                        <div class="md:col-span-4">
+                            <label class="text-xs text-slate-600">Nama Kegiatan</label>
+                            <input id="addKegNama" class="px-3 py-2 border rounded w-full" placeholder="Nama kegiatan">
+                        </div>
+                        <div class="md:col-span-6 flex gap-2 mt-2">
+                            <button onclick="addKegiatanFromForm()" class="px-4 py-2 bg-emerald-600 text-white rounded">Tambah Kegiatan</button>
+                            <button onclick="toggleAddSubForm(true)" class="px-4 py-2 bg-slate-300 rounded">Batal</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm" id="dataTable">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 uppercase text-xs tracking-wider">
+                                <th class="p-4">Kode & Nama PROGRAM</th>
+                                <th class="p-4 text-right">Pagu Anggaran</th>
+                                <th class="p-4 text-right bg-amber-50/50">Realisasi s/d bulan ini<br><span class="normal-case font-normal text-slate-400">(Sesudah Akumulasi)</span></th>
+                                <th class="p-4 text-right bg-emerald-50/50">Total Realisasi<br><span class="normal-case font-normal text-slate-400">(Sebelum Akumulasi)</span></th>
+                                <th class="p-4 text-center">Capaian (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody" class="divide-y divide-slate-100">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>        </main>
+    </div>
+
+    <script>
+        // Data Struktur Keuangan
+        const dataset = [
+            {
+                kode: "1.01.01",
+                nama: "Pengembangan Infrastruktur & Digitalisasi",
+                subKegiatan: [
+                    { kode: "1.01.01.01", nama: "Pengadaan Server & Cloud Storage", pagu: 200000000, realisasi: 180000000 },
+                    { kode: "1.01.01.02", nama: "Pengembangan Aplikasi Dashboard", pagu: 150000000, realisasi: 120000000 },
+                    { kode: "1.01.01.03", nama: "Pelatihan & Pendampingan SDM", pagu: 50000000, realisasi: 35000000 }
+                ]
+            },
+            {
+                kode: "1.01.02",
+                nama: "Peningkatan Pelayanan Administrasi Publik",
+                subKegiatan: [
+                    { kode: "1.01.02.01", nama: "Pengadaan Perangkat Otomasi Layanan", pagu: 100000000, realisasi: 90000000 },
+                    { kode: "1.01.02.02", nama: "Cetak Dokumen & Atribut Pelayanan", pagu: 30000000, realisasi: 25000000 }
+                ]
+            }
+        ];
+
+        function formatRupiah(angka) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka);
+        }
+
+        // Hitung agregat dan data chart
+        function computeTotals() {
+            let totalPaguGlobal = 0;
+            let totalRealisasiGlobal = 0;
+            let totalSubCount = 0;
+            let chartLabels = [];
+            let chartPagu = [];
+            let chartRealisasi = [];
+
+            dataset.forEach(kegiatan => {
+                const paguFromSubs = kegiatan.subKegiatan.reduce((acc, item) => acc + item.pagu, 0);
+                const realFromSubs = kegiatan.subKegiatan.reduce((acc, item) => acc + item.realisasi, 0);
+                // if user set manual pagu on kegiatan, use it; otherwise use sum of subs
+                const paguKegiatan = (typeof kegiatan.pagu === 'number' ? kegiatan.pagu : (typeof kegiatan.paguManual === 'number' ? kegiatan.paguManual : paguFromSubs));
+                // if user set manual parsial on kegiatan, use it for parsial display (not for akumulasi)
+                const parsialKegiatan = (typeof kegiatan.parsial === 'number' ? kegiatan.parsial : (typeof kegiatan.parsialManual === 'number' ? kegiatan.parsialManual : realFromSubs));
+
+                totalPaguGlobal += paguKegiatan;
+                totalRealisasiGlobal += realFromSubs;
+                totalSubCount += kegiatan.subKegiatan.length;
+
+                chartLabels.push(kegiatan.nama);
+                chartPagu.push(paguKegiatan);
+                chartRealisasi.push(realFromSubs);
+            });
+
+            return { totalPaguGlobal, totalRealisasiGlobal, totalSubCount, chartLabels, chartPagu, chartRealisasi };
+        }
+
+        // LocalStorage persistence
+        function saveToLocalStorage() {
+            try {
+                localStorage.setItem('simon_dataset', JSON.stringify(dataset));
+            } catch (e) {
+                console.warn('Gagal menyimpan ke localStorage', e);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const raw = localStorage.getItem('simon_dataset');
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (!Array.isArray(parsed)) return;
+                // replace contents of dataset array (mutate const)
+                dataset.length = 0;
+                parsed.forEach(k => dataset.push(k));
+            } catch (e) {
+                console.warn('Gagal memuat dari localStorage', e);
+            }
+        }
+
+        function renderDashboardView() {
+            const totals = computeTotals();
+            document.getElementById("kpi-pagu").innerText = formatRupiah(totals.totalPaguGlobal);
+            document.getElementById("kpi-parsial").innerText = formatRupiah(totals.totalRealisasiGlobal);
+            document.getElementById("kpi-akumulasi").innerText = formatRupiah(totals.totalRealisasiGlobal);
+            document.getElementById("kpi-sisa").innerText = formatRupiah(totals.totalPaguGlobal - totals.totalRealisasiGlobal);
+            document.getElementById("avg-sub").innerText = totals.totalSubCount;
+            const totalPersen = ((totals.totalRealisasiGlobal / totals.totalPaguGlobal) * 100).toFixed(1);
+            document.getElementById("kpi-persen").innerText = `${totalPersen}% Capaian Akumulasi`;
+
+            renderChart(totals.chartLabels, totals.chartPagu, totals.chartRealisasi);
+
+            document.getElementById('view-dashboard').classList.remove('hidden');
+            document.getElementById('view-table').classList.add('hidden');
+        }
+
+        function renderRincianKegiatan() {
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = "";
+            dataset.forEach(kegiatan => {
+                const parentIdx = dataset.indexOf(kegiatan);
+                const paguFromSubs = kegiatan.subKegiatan.reduce((acc, item) => acc + item.pagu, 0);
+                const realFromSubs = kegiatan.subKegiatan.reduce((acc, item) => acc + item.realisasi, 0);
+                const paguKegiatan = (typeof kegiatan.pagu === 'number' ? kegiatan.pagu : (typeof kegiatan.paguManual === 'number' ? kegiatan.paguManual : paguFromSubs));
+                const parsialKegiatan = (typeof kegiatan.parsial === 'number' ? kegiatan.parsial : (typeof kegiatan.parsialManual === 'number' ? kegiatan.parsialManual : realFromSubs));
+                const persenKegiatan = ((realFromSubs / (paguKegiatan||1)) * 100).toFixed(1);
+
+                const kegiatanRow = document.createElement('tr');
+                kegiatanRow.className = 'bg-slate-800 text-white font-semibold';
+                kegiatanRow.innerHTML = `
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            <input type="text" value="${kegiatan.kode}" onchange="onKegiatanTextChange(${parentIdx}, 'kode', this.value)" class="font-mono text-xs px-2 py-1 rounded text-slate-900" style="width:120px">
+                            <input type="text" value="${kegiatan.nama}" onchange="onKegiatanTextChange(${parentIdx}, 'nama', this.value)" class="px-2 py-1 rounded text-slate-900 flex-1">
+                        </div>
+                    </td>
+                    <td class="p-4 text-right">
+                        <input type="number" value="${paguKegiatan}" onchange="onKegiatanNumericChange(${parentIdx}, 'pagu', this.value)" class="w-36 text-right px-2 py-1 border rounded">
+                    </td>
+                    <td class="p-4 text-right">
+                        <input type="number" value="${parsialKegiatan}" onchange="onKegiatanNumericChange(${parentIdx}, 'parsial', this.value)" class="w-36 text-right px-2 py-1 border rounded">
+                    </td>
+                    <td class="p-4 text-right text-emerald-400 font-bold">${formatRupiah(realFromSubs)}</td>
+                    <td class="p-4 text-center">
+                        <span class="px-2 py-1 rounded text-xs ${persenKegiatan >= 80 ? 'bg-emerald-500/20 text-emerald-300' : 'bg-amber-500/20 text-amber-300'}">
+                            ${persenKegiatan}%
+                        </span>
+                    </td>
+                `;
+                tableBody.appendChild(kegiatanRow);
+            });
+
+document.getElementById('tableTitle').innerText = 'Kegiatan';
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-table').classList.remove('hidden');
+            populateParentSelect();
+        }
+
+        function renderSubKegiatan() {
+            const tableBody = document.getElementById("tableBody");
+            tableBody.innerHTML = "";
+            dataset.forEach(kegiatan => {
+                const parentIdx = dataset.indexOf(kegiatan);
+                kegiatan.subKegiatan.forEach((sub, subIdx) => {
+                    const persenSub = sub.pagu > 0 ? ((sub.realisasi / sub.pagu) * 100).toFixed(1) : '0.0';
+                    const subRow = document.createElement('tr');
+                    subRow.className = 'hover:bg-slate-50 transition border-b border-slate-100';
+
+                    subRow.innerHTML = `
+                        <td class="p-4 pl-8 text-slate-700">
+                            <div class="flex items-center gap-2">
+                                <input type="text" value="${sub.kode}" onchange="onSubTextChange(${parentIdx}, ${subIdx}, 'kode', this.value)" class="font-mono text-xs px-2 py-1 rounded text-slate-700" style="width:120px">
+                                <input type="text" value="${sub.nama}" onchange="onSubTextChange(${parentIdx}, ${subIdx}, 'nama', this.value)" class="px-2 py-1 rounded text-slate-700 flex-1">
+                            </div>
+                        </td>
+                        <td class="p-4 text-right text-slate-600">
+                            <input type="number" class="w-32 text-right px-2 py-1 border rounded" value="${sub.pagu}" onchange="onSubValueChange(${parentIdx}, ${subIdx}, 'pagu', this.value)">
+                        </td>
+                        <td class="p-4 text-right font-medium text-amber-700 bg-amber-50/30">
+                            <input type="number" class="w-32 text-right px-2 py-1 border rounded" value="${sub.realisasi}" onchange="onSubValueChange(${parentIdx}, ${subIdx}, 'realisasi', this.value)">
+                        </td>
+                        <td class="p-4 text-right text-slate-400 bg-emerald-50/10">-</td>
+                        <td class="p-4 text-center">
+                            <span class="text-xs font-semibold text-slate-500">${persenSub}%</span>
+                        </td>
+                    `;
+                    tableBody.appendChild(subRow);
+                });
+            });
+
+            document.getElementById('tableTitle').innerText = 'Daftar Sub-Kegiatan (Detail Parsial)';
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-table').classList.remove('hidden');
+            populateParentSelect();
+        }
+
+        function onSubValueChange(parentIdx, subIdx, field, value) {
+            const num = Number(value) || 0;
+            if (!dataset[parentIdx] || !dataset[parentIdx].subKegiatan[subIdx]) return;
+            dataset[parentIdx].subKegiatan[subIdx][field] = num;
+            // update percentage cell and totals by re-rendering views
+            if (window.currentView === 'sub') renderSubKegiatan();
+            else renderRincianKegiatan();
+            renderDashboardView();
+            saveToLocalStorage();
+        }
+
+        function onKegiatanTextChange(parentIdx, field, value) {
+            if (!dataset[parentIdx]) return;
+            dataset[parentIdx][field] = value;
+            saveToLocalStorage();
+            renderRincianKegiatan();
+            renderDashboardView();
+        }
+
+        function onKegiatanNumericChange(parentIdx, field, value) {
+            const num = Number(value) || 0;
+            if (!dataset[parentIdx]) return;
+            if (field === 'pagu') dataset[parentIdx].pagu = num;
+            else if (field === 'parsial') dataset[parentIdx].parsial = num;
+            saveToLocalStorage();
+            renderRincianKegiatan();
+            renderDashboardView();
+        }
+
+        function onSubTextChange(parentIdx, subIdx, field, value) {
+            if (!dataset[parentIdx] || !dataset[parentIdx].subKegiatan[subIdx]) return;
+            dataset[parentIdx].subKegiatan[subIdx][field] = value;
+            saveToLocalStorage();
+            renderSubKegiatan();
+            renderRincianKegiatan();
+            renderDashboardView();
+        }
+
+        function populateParentSelect() {
+            const sel = document.getElementById('addSubParent');
+            if (!sel) return;
+            sel.innerHTML = '';
+            dataset.forEach((kegiatan, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.text = `${kegiatan.kode} - ${kegiatan.nama}`;
+                sel.appendChild(opt);
+            });
+        }
+
+        function toggleAddSubForm(hide = false) {
+            const subForm = document.getElementById('addSubForm');
+            const kegForm = document.getElementById('addKegForm');
+            if (window.currentView === 'rincian') {
+                // show/hide kegiatan form
+                if (!kegForm) return;
+                if (hide) kegForm.classList.add('hidden');
+                else kegForm.classList.remove('hidden');
+            } else {
+                // show/hide sub form
+                if (!subForm) return;
+                if (hide) subForm.classList.add('hidden');
+                else { subForm.classList.remove('hidden'); populateParentSelect(); }
+            }
+        }
+        
+        function toggleProgramMenu() {
+            const submenu = document.getElementById('programSubmenu');
+            const icon = document.getElementById('programToggleIcon');
+            if (!submenu || !icon) return;
+            const isHidden = submenu.classList.toggle('hidden');
+            icon.classList.toggle('fa-chevron-down', isHidden);
+            icon.classList.toggle('fa-chevron-up', !isHidden);
+            // when submenu is shown, also open the same view as Kegiatan
+            if (!isHidden) {
+                showView('rincian','nav-kegiatan');
+            }
+        }
+
+        function addKegiatanFromForm() {
+            const kode = document.getElementById('addKegKode').value.trim();
+            const nama = document.getElementById('addKegNama').value.trim();
+            if (!kode || !nama) return alert('Lengkapi kode dan nama kegiatan');
+            dataset.push({ kode, nama, subKegiatan: [] });
+            document.getElementById('addKegKode').value = '';
+            document.getElementById('addKegNama').value = '';
+            toggleAddSubForm(true);
+            renderRincianKegiatan();
+            renderDashboardView();
+            saveToLocalStorage();
+        }
+
+        function addSubKegiatanFromForm() {
+            const parentIdx = parseInt(document.getElementById('addSubParent').value, 10);
+            const kode = document.getElementById('addSubKode').value.trim();
+            const nama = document.getElementById('addSubNama').value.trim();
+            const pagu = Number(document.getElementById('addSubPagu').value) || 0;
+            const realisasi = Number(document.getElementById('addSubRealisasi').value) || 0;
+            if (isNaN(parentIdx) || !dataset[parentIdx]) return alert('Pilih kegiatan induk yang valid');
+            if (!kode || !nama) return alert('Lengkapi kode dan nama sub-kegiatan');
+
+            dataset[parentIdx].subKegiatan.push({ kode, nama, pagu, realisasi });
+            // clear form
+            document.getElementById('addSubKode').value = '';
+            document.getElementById('addSubNama').value = '';
+            document.getElementById('addSubPagu').value = '';
+            document.getElementById('addSubRealisasi').value = '';
+            toggleAddSubForm(true);
+            // refresh current view
+            if (window.currentView === 'sub') renderSubKegiatan();
+            else renderRincianKegiatan();
+            renderDashboardView();
+            saveToLocalStorage();
+        }
+
+        function renderChart(labels, paguData, realisasiData) {
+            const ctx = document.getElementById('realisasiChart').getContext('2d');
+            // Destroy existing chart if any
+            if (window._realisasiChart) {
+                window._realisasiChart.destroy();
+            }
+            window._realisasiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Pagu Anggaran',
+                            data: paguData,
+                            backgroundColor: '#CBD5E1'
+                        },
+                        {
+                            label: 'Realisasi Akumulasi',
+                            data: realisasiData,
+                            backgroundColor: '#10B981'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'Rp ' + (value / 1000000) + ' Jt';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function filterTable() {
+            const input = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.querySelectorAll("#tableBody tr");
+            rows.forEach(row => {
+                // gather searchable text from cells and input values
+                const cells = Array.from(row.querySelectorAll('td'));
+                const text = cells.map(td => {
+                    const inp = td.querySelector('input');
+                    return inp ? (inp.value + ' ' + (td.innerText || '')) : (td.innerText || '');
+                }).join(' ').toLowerCase();
+                row.style.display = text.includes(input) ? "" : "none";
+            });
+        }
+
+        function setActiveNav(id) {
+            ['nav-dashboard','nav-kegiatan','nav-sub'].forEach(n => {
+                const el = document.getElementById(n);
+                if (!el) return;
+                if (n === id) {
+                    el.classList.remove('text-slate-400');
+                    el.classList.add('bg-blue-600','text-white');
+                } else {
+                    el.classList.remove('bg-blue-600','text-white');
+                    el.classList.add('text-slate-400');
+                }
+            });
+        }
+
+        function showView(view, activeNavId = 'nav-dashboard') {
+            // track current view for export behavior
+            window.currentView = view;
+            if (view === 'dashboard') {
+                setActiveNav('nav-dashboard');
+                renderDashboardView();
+                // hide add button in dashboard
+                const btn = document.getElementById('btnShowAddSub'); if (btn) btn.style.display = 'none';
+            } else if (view === 'rincian') {
+                setActiveNav(activeNavId || 'nav-kegiatan');
+                renderRincianKegiatan();
+                const btn = document.getElementById('btnShowAddSub'); if (btn) { btn.style.display = ''; btn.innerText = 'Tambah Kegiatan'; }
+            } else if (view === 'sub') {
+                setActiveNav('nav-sub');
+                renderSubKegiatan();
+                const btn = document.getElementById('btnShowAddSub'); if (btn) { btn.style.display = ''; btn.innerText = 'Tambah Sub'; }
+            }
+        }
+
+        // Initialize default view
+        document.addEventListener("DOMContentLoaded", () => {
+            loadFromLocalStorage();
+            showView('dashboard');
+        });
+
+        // Export visible table rows to CSV
+        function exportTableCSV() {
+            const title = document.getElementById('tableTitle') ? document.getElementById('tableTitle').innerText : 'export';
+            const filename = title.toLowerCase().replace(/[^a-z0-9]+/g,'_') + '.csv';
+            const table = document.getElementById('dataTable');
+            if (!table) return alert('Tabel tidak ditemukan');
+
+            const rows = Array.from(table.querySelectorAll('thead tr, tbody tr')).filter(r => r.style.display !== 'none');
+            const csv = rows.map(row => {
+                const cols = Array.from(row.querySelectorAll('th, td')).map(td => {
+                    const inp = td.querySelector('input');
+                    let text = '';
+                    if (inp) text = String(inp.value);
+                    else text = td.innerText.replace(/\n/g,' ').trim();
+                    // remove currency formatting for numbers
+                    text = text.replace(/Rp\s?|\.|,00/g,'');
+                    text = text.replace(/"/g, '""');
+                    return `"${text}"`;
+                });
+                return cols.join(',');
+            }).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
