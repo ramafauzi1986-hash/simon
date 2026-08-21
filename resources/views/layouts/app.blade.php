@@ -20,8 +20,6 @@
 <a class="nav-link d-flex justify-content-between align-items-center program-toggle" href="#programMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{request()->routeIs('programs.*','kegiatans.*','sub-kegiatans.*') ? 'true' : 'false'}}" aria-controls="programMenu"><span>📁 Program</span><span class="chevron">›</span></a>
 <div class="collapse sidebar-submenu {{request()->routeIs('programs.*','kegiatans.*','sub-kegiatans.*') ? 'show' : ''}}" id="programMenu">
 <a class="nav-link" href="{{route('programs.index')}}">📁 Daftar Program</a>
-<a class="nav-link" href="{{route('kegiatans.index')}}">📋 Kegiatan</a>
-<a class="nav-link" href="{{route('sub-kegiatans.index')}}">🗂️ Sub Kegiatan</a>
 </div>
 <a class="nav-link" href="{{route('indikators.index')}}">🎯 Indikator Kinerja</a>
 <a class="nav-link" href="{{route('realisasi.index')}}">📈 Realisasi & Evidence</a>
