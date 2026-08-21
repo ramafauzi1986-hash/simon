@@ -25,9 +25,27 @@ class KegiatanController extends Controller
         return back()->with('success', 'Kegiatan berhasil ditambahkan pada Program yang dipilih.');
     }
 
+    public function update(Request $request, Program $program, Kegiatan $kegiatan)
+    {
+        abort_unless($kegiatan->program_id === $program->id, 404);
+
+        $data = $request->validate([
+            'kode' => 'nullable|string|max:50',
+            'nama' => 'required|string|max:255',
+        ]);
+
+        $kegiatan->update($data);
+        return back()->with('success', 'Kegiatan berhasil diperbarui.');
+    }
+
     public function destroy(Program $program, Kegiatan $kegiatan)
     {
         abort_unless($kegiatan->program_id === $program->id, 404);
+
+        if ($kegiatan->subKegiatans()->exists()) {
+            return back()->with('error', 'Kegiatan tidak dapat dihapus karena masih memiliki Sub Kegiatan. Hapus Sub Kegiatan di dalamnya terlebih dahulu.');
+        }
+
         $kegiatan->delete();
         return back()->with('success', 'Kegiatan berhasil dihapus.');
     }
