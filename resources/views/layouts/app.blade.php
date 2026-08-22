@@ -20,9 +20,9 @@
 @php($programOpen = request()->routeIs('programs.*','kegiatans.*','sub-kegiatans.*'))
 <a class="nav-link d-flex justify-content-between align-items-center program-toggle {{ $programOpen ? 'active' : '' }}" href="#programMenu" data-bs-toggle="collapse" role="button" aria-expanded="{{ $programOpen ? 'true' : 'false' }}" aria-controls="programMenu"><span>📁 Program</span><span class="chevron">›</span></a>
 <div class="collapse sidebar-submenu {{ $programOpen ? 'show' : '' }}" id="programMenu">
-<a class="nav-link" href="{{route('programs.index')}}">📁 Daftar Program</a>
-<a class="nav-link {{ request()->routeIs('programs.show','programs.kegiatans.*') ? 'active' : '' }}" href="{{ route('programs.index') }}">📋 Kegiatan</a>
-<a class="nav-link {{ request()->routeIs('kegiatans.*','sub-kegiatans.*') ? 'active' : '' }}" href="{{ route('programs.index') }}">🗂️ Sub Kegiatan</a>
+<a class="nav-link {{ request()->routeIs('programs.index') ? 'active' : '' }}" href="{{route('programs.index')}}">📁 Daftar Program</a>
+<a class="nav-link {{ request()->routeIs('programs.show','programs.kegiatans.*','kegiatans.*') ? 'active' : '' }}" href="{{route('programs.index')}}">📋 Kegiatan</a>
+<a class="nav-link {{ request()->routeIs('sub-kegiatans.*','kegiatans.sub-kegiatan.*') ? 'active' : '' }}" href="{{route('programs.index')}}">🗂️ Sub Kegiatan</a>
 </div>
 <a class="nav-link" href="{{route('indikators.index')}}">🎯 Indikator Kinerja</a>
 <a class="nav-link" href="{{route('realisasi.index')}}">📈 Realisasi & Evidence</a>
